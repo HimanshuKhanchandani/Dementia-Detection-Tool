@@ -36,6 +36,22 @@ def simpson_relative_band_power(ppt_psd,freqs,freq_bands):
         relative_bands_list.append(np.expand_dims(simpson(ppt_psd[:,indices[i]:indices[i+1]+1,:],dx=dx,axis=1),axis=1)/total_power)
     return np.transpose(np.squeeze(np.array(relative_bands_list)),(1,0,2))
 
+def absolute_band_power(ppt_psd,freqs,freq_bands):
+    indices = freq_ind(freqs,freq_bands)
+    dx = freqs[1]-freqs[0]
+    absolute_bands_list = []
+    for i in range(len(indices)-1):
+        absolute_bands_list.append(dx*np.sum(ppt_psd[:,indices[i]:indices[i+1],:],axis=1))
+    return np.transpose(np.array(absolute_bands_list),(1,0,2))
+
+def simpson_absolute_band_power(ppt_psd,freqs,freq_bands):
+    indices = freq_ind(freqs,freq_bands)
+    dx = freqs[1]-freqs[0]
+    absolute_bands_list = []
+    for i in range(len(indices)-1):
+        absolute_bands_list.append(simpson(ppt_psd[:,indices[i]:indices[i+1]+1,:],dx=dx,axis=1))
+    return np.transpose(np.array(absolute_bands_list),(1,0,2))
+
 def create_numeric_labels(group_name):
     if group_name == 'A':
         return 0
