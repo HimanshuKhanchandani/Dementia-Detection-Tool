@@ -38,8 +38,8 @@ def absolute_band_power(ppt_psd,freqs,freq_bands,endpoints=freq_ind):
 
 def create_numeric_labels(group_name):
     if group_name == 'A':
-        return 0
-    if group_name == 'F':
         return 1
-    if group_name == 'C':
+    if group_name == 'F':
         return 2
+    if group_name == 'C':
+        return 0
