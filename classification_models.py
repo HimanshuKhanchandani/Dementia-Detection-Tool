@@ -14,7 +14,7 @@ def remove_class(rbp_array,num_epochs,target_labels,class_):
     if class_ == 'A':
         return rbp_array[36:].copy(),num_epochs[36:].copy(),target_labels[36:].copy()
     if class_ == 'C':
-        return np.concatenate(rbp_array[:36],rbp_array[65:]), np.concatenate(num_epochs[:36],num_epochs[65:]), np.concatenate(target_labels[:36],target_labels[65:])
+        return np.concatenate((rbp_array[:36],rbp_array[65:])), np.concatenate((num_epochs[:36],num_epochs[65:])), np.concatenate((target_labels[:36],target_labels[65:]))
 
 def partial_flatten(rbp_array,num_epochs,target_labels,exclude=None,flatten_final=True):
     
