@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 #from lightgbm import LGBMClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.decomposition import PCA
 
 def remove_class(rbp_array,num_epochs,target_labels,class_):
     if class_ == 'F':
@@ -72,7 +73,8 @@ def kNN_cross(rbp_array,num_epochs,target_labels,removed_class,n_neighbors):
         labels = [0,2]
     if removed_class == 'C':
         labels = [1,2]
-    confusion_matrices = []
+    confusion_matricesTest = []
+    confusion_matricesTrain = []
     mod_rbp, mod_num_epochs, mod_target_labels = remove_class(rbp_array,num_epochs,target_labels,removed_class)
     for i in range(len(mod_target_labels)):
         train_X, train_y = partial_flatten(mod_rbp,mod_num_epochs,mod_target_labels,exclude=i,flatten_final=True)
@@ -86,21 +88,29 @@ def kNN_cross(rbp_array,num_epochs,target_labels,removed_class,n_neighbors):
         ThreeNN.fit(train_X, train_y)
         
         test_X = scaler.transform(test_X)
-        
-        confusion_matrices += [confusion_matrix(test_y,ThreeNN.predict(test_X),labels=labels)]
-    confusion_matrices = np.array(confusion_matrices)
-    total_confusion = np.sum(confusion_matrices, axis= 0)
-    return {'acc':accuracy(total_confusion), 'sens':sensitivity(total_confusion), 'spec':specificity(total_confusion), 'f1':f1(total_confusion)}
+        confusion_matricesTrain += [confusion_matrix(train_y,ThreeNN.predict(train_X),labels=labels)]
+        confusion_matricesTest += [confusion_matrix(test_y,ThreeNN.predict(test_X),labels=labels)]
+    confusion_matricesTrain = np.array(confusion_matricesTrain)
+    confusion_matricesTest = np.array(confusion_matricesTest)
+    total_confusion_Train = np.sum(confusion_matricesTrain, axis= 0)
+    total_confusion_Test = np.sum(confusion_matricesTest, axis= 0)
+    return {'Test_acc':accuracy(total_confusion_Test), 'Test_sens':sensitivity(total_confusion_Test), 'Test_spec':specificity(total_confusion_Test), 'Test_f1':f1(total_confusion_Test), 'Train_acc':accuracy(total_confusion_Train), 'Train_sens':sensitivity(total_confusion_Train), 'Train_spec':specificity(total_confusion_Train), 'Train_f1':f1(total_confusion_Train) }
 
 
-def RF_cross(rbp_array,num_epochs,target_labels,removed_class):
+def RF_cross(rbp_array,num_epochs,target_labels,removed_class, min_samples_split = 0.01, PCA_components = 95):
+    
+    '''
+    The function below runs our two-class Ranfom Forest modeling routine with leave-one-subject-out cross-validation. It returns a dictionary of cross-validation accuracy, sensitivity, specificity, and F1 scores computed from the total confusion matrix. removed_class indicates the class to be excluded to create a two-class classification problem (same labels as the remove_class function).
+    '''
+    
     if removed_class == 'F':
         labels = [0,1]
     if removed_class == 'A':
         labels = [0,2]
     if removed_class == 'C':
         labels = [1,2]
-    confusion_matrices = []
+    confusion_matricesTest = []
+    confusion_matricesTrain = []
     mod_rbp, mod_num_epochs, mod_target_labels = remove_class(rbp_array,num_epochs,target_labels,removed_class)
     for i in range(len(mod_target_labels)):
         train_X, train_y = partial_flatten(mod_rbp,mod_num_epochs,mod_target_labels,exclude=i,flatten_final=True)
@@ -110,44 +120,24 @@ def RF_cross(rbp_array,num_epochs,target_labels,removed_class):
         scaler = StandardScaler()
         train_X = scaler.fit_transform(train_X)
         
-        RF = RandomForestClassifier()
+        pca = PCA(n_components = PCA_components)
+        train_X = pca.fit_transform(train_X)
+        
+        RF = RandomForestClassifier(min_samples_split = min_samples_split)
         RF.fit(train_X, train_y)
         
         test_X = scaler.transform(test_X)
+        test_X = pca.transform(test_X)
         
-        confusion_matrices += [confusion_matrix(test_y, RF.predict(test_X),labels=labels)]
-    confusion_matrices = np.array(confusion_matrices)
-    total_confusion = np.sum(confusion_matrices, axis= 0)
-    return {'acc':accuracy(total_confusion), 'sens':sensitivity(total_confusion), 
-            'spec':specificity(total_confusion), 'f1':f1(total_confusion)}
+        confusion_matricesTrain += [confusion_matrix(train_y, RF.predict(train_X),labels=labels)]
+        confusion_matricesTest += [confusion_matrix(test_y, RF.predict(test_X),labels=labels)]
+    confusion_matricesTrain = np.array(confusion_matricesTrain)
+    confusion_matricesTest = np.array(confusion_matricesTest)
+    total_confusion_Train = np.sum(confusion_matricesTrain, axis= 0)
+    total_confusion_Test = np.sum(confusion_matricesTest, axis= 0)
+    return {'Test_acc':accuracy(total_confusion_Test), 'Test_sens':sensitivity(total_confusion_Test), 'Test_spec':specificity(total_confusion_Test), 'Test_f1':f1(total_confusion_Test), 'Train_acc':accuracy(total_confusion_Train), 'Train_sens':sensitivity(total_confusion_Train), 'Train_spec':specificity(total_confusion_Train), 'Train_f1':f1(total_confusion_Train) }
 
-def LightGBM_cross(rbp_array,num_epochs,target_labels,removed_class):
-    if removed_class == 'F':
-        labels = [0,1]
-    if removed_class == 'A':
-        labels = [0,2]
-    if removed_class == 'C':
-        labels = [1,2]
-    confusion_matrices = []
-    mod_rbp, mod_num_epochs, mod_target_labels = remove_class(rbp_array,num_epochs,target_labels,removed_class)
-    for i in range(len(mod_target_labels)):
-        train_X, train_y = partial_flatten(mod_rbp,mod_num_epochs,mod_target_labels,exclude=i,flatten_final=True)
-        test_X = mod_rbp[i,0:mod_num_epochs[i],:,:].reshape(mod_num_epochs[i],-1)
-        test_y = mod_target_labels[i]*np.ones(mod_num_epochs[i])
 
-        scaler = StandardScaler()
-        train_X = scaler.fit_transform(train_X)
-        
-        LGBM = LGBMClassifier()
-        LGBM.fit(train_X, train_y)
-        
-        test_X = scaler.transform(test_X)
-        
-        confusion_matrices += [confusion_matrix(test_y, LGBM.predict(test_X),labels=labels)]
-    confusion_matrices = np.array(confusion_matrices)
-    total_confusion = np.sum(confusion_matrices, axis= 0)
-    return {'acc':accuracy(total_confusion), 'sens':sensitivity(total_confusion), 
-            'spec':specificity(total_confusion), 'f1':f1(total_confusion)}
 
 
 def MLP_cross(rbp_array,num_epochs,target_labels,removed_class, hidden_layer_sizes = (3,1)):
@@ -157,7 +147,8 @@ def MLP_cross(rbp_array,num_epochs,target_labels,removed_class, hidden_layer_siz
         labels = [0,2]
     if removed_class == 'C':
         labels = [1,2]
-    confusion_matrices = []
+    confusion_matricesTest = []
+    confusion_matricesTrain = []
     mod_rbp, mod_num_epochs, mod_target_labels = remove_class(rbp_array,num_epochs,target_labels,removed_class)
     for i in range(len(mod_target_labels)):
         train_X, train_y = partial_flatten(mod_rbp,mod_num_epochs,mod_target_labels,exclude=i,flatten_final=True)
@@ -172,8 +163,10 @@ def MLP_cross(rbp_array,num_epochs,target_labels,removed_class, hidden_layer_siz
         
         test_X = scaler.transform(test_X)
         
-        confusion_matrices += [confusion_matrix(test_y, MLP.predict(test_X),labels=labels)]
-    confusion_matrices = np.array(confusion_matrices)
-    total_confusion = np.sum(confusion_matrices, axis= 0)
-    return {'acc':accuracy(total_confusion), 'sens':sensitivity(total_confusion), 
-            'spec':specificity(total_confusion), 'f1':f1(total_confusion)}
+        confusion_matricesTrain += [confusion_matrix(train_y, MLP.predict(train_X),labels=labels)]
+        confusion_matricesTest += [confusion_matrix(test_y, MLP.predict(test_X),labels=labels)]
+    confusion_matricesTrain = np.array(confusion_matricesTrain)
+    confusion_matricesTest = np.array(confusion_matricesTest)
+    total_confusion_Train = np.sum(confusion_matricesTrain, axis= 0)
+    total_confusion_Test = np.sum(confusion_matricesTest, axis= 0)
+    return {'Test_acc':accuracy(total_confusion_Test), 'Test_sens':sensitivity(total_confusion_Test), 'Test_spec':specificity(total_confusion_Test), 'Test_f1':f1(total_confusion_Test), 'Train_acc':accuracy(total_confusion_Train), 'Train_sens':sensitivity(total_confusion_Train), 'Train_spec':specificity(total_confusion_Train), 'Train_f1':f1(total_confusion_Train) }
