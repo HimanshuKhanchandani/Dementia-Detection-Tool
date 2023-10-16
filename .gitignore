@@ -1,7 +1,6 @@
 #folder containing processed data to be loaded in for models
 processed_data/
 #folder containing the raw and preprocessed EEG data
-data/*/
 #folder for log files
 logs/
 #Mac stuff
