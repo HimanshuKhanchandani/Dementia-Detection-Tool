@@ -4,6 +4,8 @@ processed_data/
 data/
 #folder for log files
 logs/
+#Mac stuff
+*.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
