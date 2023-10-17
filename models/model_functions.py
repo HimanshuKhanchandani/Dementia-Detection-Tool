@@ -3,6 +3,9 @@ import mne
 import config
 from scipy.integrate import simpson
 
+# test set
+EXCLUDED = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
+
 def load_subject(id,path=config.PATH):
     """loads subject using their numeric id in the data folders"""
     return mne.io.read_raw_eeglab(path + '/derivatives/sub-' + str(id).zfill(3)
@@ -54,7 +57,7 @@ def epochs_psd(raw,duration,overlap,seg_length,fmin=0.5,fmax=45,tmin=None,tmax=N
 
     Returns
     -------
-    epoch_psds
+    epoch_psds :
         psd of each EEG channel for each epoch, stored in an mne EpochsSpectrum object.
     """    
     epochs = mne.make_fixed_length_epochs(raw,duration=duration,preload=True,overlap=overlap,verbose=False)
@@ -87,10 +90,9 @@ def absolute_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
         Array of absolute band power values of shape (num_rows) x (num_channels) x (len(freq_bands)-1)
     """    
     indices = endpoints(freqs,freq_bands)
-    dx = freqs[1]-freqs[0]
     absolute_bands_list = []
     for i in range(len(indices)-1):
-        absolute_bands_list.append(simpson(psds[...,indices[i]:indices[i+1]+1],dx=dx,axis=-1))
+        absolute_bands_list.append(simpson(psds[...,indices[i]:indices[i+1]+1],freqs[indices[i]:indices[i+1]+1],axis=-1))
     return np.transpose(np.array(absolute_bands_list),(1,2,0))
 
 def relative_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
@@ -109,16 +111,17 @@ def relative_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
 
     Returns
     -------
-    abps: ndarray
+    rbps: ndarray
         Array of relative band power values of shape (num_rows) x (num_channels) x (len(freq_bands)-1).
     """    
     indices = endpoints(freqs,freq_bands)
-    dx = freqs[1]-freqs[0]
-    total_power = np.expand_dims(simpson(psds[...,indices[0]:indices[-1]+1],dx=dx,axis=-1),axis=-1)
+    total_power = np.expand_dims(simpson(psds[...,indices[0]:indices[-1]+1],freqs[indices[0]:indices[-1]+1],axis=-1),axis=-1)
     return np.divide(absolute_band_power(psds,freqs,freq_bands,endpoints=endpoints),total_power)
 
 def create_numeric_labels(group_name,labels={'A':1,'F':2,'C':0}):
     """assigns numeric labels to AD, FTD, and CN subjects based on labels dict"""
     return labels[group_name]
+
+
 
 
