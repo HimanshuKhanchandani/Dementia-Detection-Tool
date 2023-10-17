@@ -16,4 +16,5 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
  
  ### Dependencies
  You need to have MNE package installed to read and work with EEG data in python. 
- The dataset for the project can be found on https://github.com/OpenNeuroDatasets/ds004504/tree/main and may be downloaded using datalad. If you are new to datalad, like I was, following tutorial may be helpful (https://psychoinformatics-de.github.io/rdm-course/aio/index.html). Once you download the data in your favorite location, put that location into config.
+ 
+The dataset for the project can be found on https://github.com/OpenNeuroDatasets/ds004504/tree/main and may be downloaded using datalad. If you are new to datalad, like I was, following tutorial may be helpful (https://psychoinformatics-de.github.io/rdm-course/aio/index.html). Once you download the data in your favorite location, put that location into config.py within the models folder, and that should make all the other scripts access the data easily. 
