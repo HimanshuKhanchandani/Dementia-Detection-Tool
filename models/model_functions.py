@@ -38,7 +38,7 @@ def epochs_psd(raw,duration,overlap,seg_length,fmin=0.5,fmax=45,tmin=None,tmax=N
     raw : 
         loaded RawEEGLAB data.
     duration : float
-        Duration of each epoch in seconds
+        Duration of each epoch in seconds.
     overlap : float
         overlap between epochs, in seconds.
     seg_length : float
@@ -75,9 +75,9 @@ def absolute_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
     psds : ndarray
         Array of psds of shape (num_rows) x (num_channels) x len(freqs)
     freqs : ndarray
-        1-D array of frequencies 
+        1-D array of frequencies.
     freq_bands : array_like
-        List of frequencies defining the boundaries of the frequency bands
+        List of frequencies defining the boundaries of the frequency bands.
     endpoints : 
         Function used to match freq_bands to freqs.
 
@@ -99,18 +99,18 @@ def relative_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
     Parameters
     ----------
     psds : ndarray
-        Array of psds of shape (num_rows) x (num_channels) x len(freqs)
+        Array of psds of shape (num_rows) x (num_channels) x len(freqs).
     freqs : ndarray
-        1-D array of frequencies 
+        1-D array of frequencies.
     freq_bands : array_like
-        List of frequencies defining the boundaries of the frequency bands
+        List of frequencies defining the boundaries of the frequency bands.
     endpoints : 
         Function used to match freq_bands to freqs.
 
     Returns
     -------
     abps: ndarray
-        Array of relative band power values of shape (num_rows) x (num_channels) x (len(freq_bands)-1)
+        Array of relative band power values of shape (num_rows) x (num_channels) x (len(freq_bands)-1).
     """    
     indices = endpoints(freqs,freq_bands)
     dx = freqs[1]-freqs[0]
