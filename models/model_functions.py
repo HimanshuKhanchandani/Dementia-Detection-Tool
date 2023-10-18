@@ -5,8 +5,10 @@ from config import DATA_PATH, PROCESSED_DATA_PATH
 import pickle
 from scipy.integrate import simpson
 
-# test set
-EXCLUDED = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
+# STABLE
+
+# subject ids of test set 
+TEST = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
 
 def load_subject(subject_id,path=DATA_PATH):
     """loads subject using their numeric id in the data folders"""
@@ -14,7 +16,8 @@ def load_subject(subject_id,path=DATA_PATH):
                                     + '/eeg/sub-' + str(subject_id).zfill(3) + '_task-eyesclosed_eeg.set', preload = True,verbose='CRITICAL')
 
 def subject_psd(raw,seg_length,fmin=0.5,fmax=45):
-    """Computes the psd of each EEG channel for a given subject using Welch's method.
+    """
+    Computes the psd of each EEG channel for a given subject using Welch's method.
 
     Parameters
     ----------
@@ -35,7 +38,8 @@ def subject_psd(raw,seg_length,fmin=0.5,fmax=45):
     return raw.compute_psd(method='welch', fmin=fmin,fmax=fmax,n_fft=int(seg_length*raw.info['sfreq']),verbose=False)
 
 def epochs_psd(raw,duration,overlap,seg_length,fmin=0.5,fmax=45,tmin=None,tmax=None):
-    """Divides the EEG recording data into overlapping epochs for a given subject and 
+    """
+    Divides the EEG recording data into overlapping epochs for a given subject and 
     computes the psd of each EEG channel using Welch's method.
 
     Parameters
@@ -66,7 +70,8 @@ def epochs_psd(raw,duration,overlap,seg_length,fmin=0.5,fmax=45,tmin=None,tmax=N
     return epochs.compute_psd(method='welch', fmin=fmin,fmax=fmax,tmin=tmin,tmax=tmax,n_fft=int(seg_length*raw.info['sfreq']),verbose=False)
 
 def load_data(duration,overlap,seg_length,fmin=0.5,fmax=45,classes={'A':1,'F':2,'C':0},path=DATA_PATH):
-    """Loads all subjects from the specified classes, divides their EEG recordings into epochs, 
+    """
+    Loads all subjects from the specified classes, divides their EEG recordings into epochs, 
     computes the psd of each EEG channel using Welch's method, and then returns those psds with 
     the assigned class labels.
 
@@ -131,7 +136,8 @@ def freq_ind(freqs,freq_bands):
     return indices
 
 def absolute_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
-    """Computes absolute band power in each frequency band of each EEG channel of row in the psds array.
+    """
+    Computes absolute band power in each frequency band of each EEG channel of row in the psds array.
 
     Parameters
     ----------
@@ -156,7 +162,8 @@ def absolute_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
     return np.transpose(np.array(absolute_bands_list),(1,2,0))
 
 def relative_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
-    """Computes relative band power in each frequency band of each EEG channel of row in the psds array.
+    """
+    Computes relative band power in each frequency band of each EEG channel of row in the psds array.
 
     Parameters
     ----------
@@ -178,7 +185,111 @@ def relative_band_power(psds,freqs,freq_bands,endpoints=freq_ind):
     total_power = np.expand_dims(simpson(psds[...,indices[0]:indices[-1]+1],freqs[indices[0]:indices[-1]+1],axis=-1),axis=-1)
     return np.divide(absolute_band_power(psds,freqs,freq_bands,endpoints=endpoints),total_power)
 
+def align_test_labels(test=TEST,classes=['A','C','F']):
+    """
+    Aligns test set labels based on the classes that a classifier is training on. Only supports orders
+    ['A','C','F'], ['A','C'], ['C','F'], and ['A','F'].
+    """
+    if classes == ['A','C','F']:
+        return [subject_id-1 for subject_id in test]
+    if classes == ['A','C']:
+        return [subject_id-1 for subject_id in test if subject_id <= 65]
+    if classes == ['C','F']:
+        return [subject_id-37 for subject_id in test if subject_id >= 37]
+    if classes == ['A','F']:
+        return ([subject_id-1 for subject_id in test if subject_id <= 36] 
+                + [subject_id-30 for subject_id in test if subject_id >= 66])
 
+def remove_class(features,targets,class_):
+    """
+    Removes a class from the loaded data. Used when all three classes are loaded but only two
+    are being used for modeling. 
+    """
+    if class_ == 'F':
+        return features[:65],targets[:65]
+    if class_ == 'A':
+        return features[36:],targets[36:]
+    if class_ == 'C':
+        return features[:36]+features[65:], targets[:36] + targets[65:]
+
+def remove_test(features,targets,test):
+    """
+    Removes test subjects from the list of feature arrays. Before using this function the labels
+    should be aligned with align_test_labels first based on the classification problem under consideration.
+    """
+    features_train = [features[i] for i in range(len(features)) if i not in test]
+    target_train = [targets[i] for i in range(len(targets)) if i not in test]
+    return features_train, target_train
+
+
+def train_prep(features,targets,exclude=None,flatten_final=True):
+    """
+    Prepares a list of feature arrays with corresponding labels in targets for training by concatenating
+    along the first (epochs) dimension. Optionally excludes a subject for leave-one-subject-out
+    cross-validation
+
+    Parameters
+    ----------
+    features : list[ndarray]
+        List of feature arrays corresponding to each subject. 
+    targets : ndarray
+        Array of numeric class labels for each feature array.
+    exclude : int, optional
+        Excludes the feature array of the subject with index 'exclude' from the output. 
+        The default value of 'None' keeps all subjects in. 
+    flatten_final : bool, optional
+        The default value True flattens all dimensions of the output feature array except the first dimension.
+        Setting this to False preserves the 
+
+    Returns
+    -------
+    features_array : ndarray
+        Array of features with each row corresponding to a training example.
+    targets_array : ndarray
+        1-D array of labels for the training examples in features_array.
+    """
+    total_subjects = len(targets)
+    target_list = []
+    for i in range(total_subjects):
+        num_epochs = features[i].shape[0]
+        target_list.append(targets[i]*np.ones(num_epochs))
+    if exclude==None: 
+        features_array = np.concatenate(features)
+        targets_array = np.concatenate(target_list)
+    else:
+        features_array = np.concatenate(features[:exclude] + features[exclude+1:])
+        targets_array  = np.concatenate(target_list[:exclude] + target_list[exclude+1:])
+    if flatten_final:
+        features_array = features_array.reshape((features_array.shape[0],-1))
+    return features_array, targets_array
+
+def accuracy(confusion):
+    """Calculates accuracy from a confusion matrix."""
+    return np.trace(confusion)/np.sum(confusion)
+def sensitivity(confusion):
+    """
+    Calculates sensitivity from a 2 x 2 confusion matrix.
+    Index 0 corresponds to negative examples and index 1 corresponds to positive examples.
+    """
+    return confusion[1,1]/(confusion[1,1]+confusion[1,0])
+def specificity(confusion):
+    """
+    Calculates specificity from a 2 x 2 confusion matrix.
+    Index 0 corresponds to negative examples and index 1 corresponds to positive examples.
+    """
+    return confusion[0,0]/(confusion[0,0]+confusion[0,1])
+def precision(confusion):
+    """
+    Calculates precision from a 2 x 2 confusion matrix.
+    Index 0 corresponds to negative examples and index 1 corresponds to positive examples.
+    """
+    return confusion[1,1]/(confusion[1,1]+confusion[0,1])
+def f1(confusion):
+    """
+    Calculates F1 score for a 2 x 2 confusion matrix.
+    Index 0 corresponds to negative examples and index 1 corresponds to positive examples.
+    """
+    return 2*(precision(confusion)*sensitivity(confusion))/(precision(confusion)+sensitivity(confusion))
 
 
 
