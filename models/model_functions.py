@@ -239,7 +239,7 @@ def train_prep(features,targets,exclude=None,flatten_final=True):
         The default value of 'None' keeps all subjects in. 
     flatten_final : bool, optional
         The default value True flattens all dimensions of the output feature array except the first dimension.
-        Setting this to False preserves the 
+        Setting this to False preserves the features as a 2d array of shape num_channels*num_frequency_bands. 
 
     Returns
     -------
