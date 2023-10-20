@@ -3,10 +3,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import PCA
+from sklearn.decomposition import KernelPCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-
-def kNN_cross(rbps,targets,n_neighbors):
+def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
     
     '''
     Performs training on features in rbps and targets using k nearest neighbor classification and performs cross-validation 
@@ -20,7 +20,9 @@ def kNN_cross(rbps,targets,n_neighbors):
         Array of numeric class labels for each feature array.
     n_neighbors: int
            number of nearest neighbors to use
-
+    PCA_components: int
+           Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
+           
     Returns
     -------
     train_metrics_dict : dictionary
@@ -39,11 +41,15 @@ def kNN_cross(rbps,targets,n_neighbors):
 
         scaler = StandardScaler()
         train_X = scaler.fit_transform(train_X)
+        test_X = scaler.transform(test_X)
+        
+        if PCA_components != 0:
+            pca = KernelPCA(n_components = PCA_components)
+            train_X = pca.fit_transform(train_X, y = None)
+            test_X = pca.transform(test_X)
         
         ThreeNN = KNeighborsClassifier(n_neighbors=n_neighbors)
         ThreeNN.fit(train_X, train_y)
-        
-        test_X = scaler.transform(test_X)
         
         confusion_matrices_train += [confusion_matrix(train_y, ThreeNN.predict(train_X),labels=labels)]
         confusion_matrices_test += [confusion_matrix(test_y,ThreeNN.predict(test_X),labels=labels)]
@@ -64,7 +70,7 @@ def kNN_cross(rbps,targets,n_neighbors):
 
 
 
-def RF_cross(rbps, targets, min_samples_split = 0.005):
+def RF_cross(rbps, targets, n_estimators = 100, min_samples_split = 16, PCA_components = 0):
     
     '''
     Performs training on features in rbps and targets using random forest classification and performs cross-validation 
@@ -73,14 +79,18 @@ def RF_cross(rbps, targets, min_samples_split = 0.005):
     Parameters
     ----------
     rbps : list[ndarray]
-        List of feature arrays corresponding to each subject. 
+            List of feature arrays corresponding to each subject. 
     targets : ndarray
-        Array of numeric class labels for each feature array.
+            Array of numeric class labels for each feature array.
+    n_estimators: int
+            number of trees in the forest
     min_samples_split: int or floar
            The minimum number of samples required to split an internal node in random forest classifier. If int, then consider 
            min_samples_split as the minimum number. If float, then min_samples_split is a fraction and ceil(min_samples_split * 
-           n_samples) are the minimum number of samples for each split.
-  
+           n_samples) are the minimum number of samples for each split. Defaults to 16 which was found to maximize the 
+           cross-validation accuracy.  
+    PCA_components: int
+           Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
     Returns
     -------
     train_metrics_dict : dictionary
@@ -99,12 +109,17 @@ def RF_cross(rbps, targets, min_samples_split = 0.005):
 
         scaler = StandardScaler()
         train_X = scaler.fit_transform(train_X)
-        
-        RF = RandomForestClassifier(min_samples_split = min_samples_split)
-        RF.fit(train_X, train_y)
-        
         test_X = scaler.transform(test_X)
+        
+        if PCA_components != 0:
+            pca = KernelPCA(n_components = PCA_components)
+            train_X = pca.fit_transform(train_X, y = None)
+            test_X = pca.transform(test_X)
        
+        
+        RF = RandomForestClassifier(n_estimators = n_estimators, min_samples_split = min_samples_split)
+        RF.fit(train_X, train_y)
+    
         
         confusion_matrices_train += [confusion_matrix(train_y, RF.predict(train_X),labels=labels)]
         confusion_matrices_test += [confusion_matrix(test_y,RF.predict(test_X),labels=labels)]
