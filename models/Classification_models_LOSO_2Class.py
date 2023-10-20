@@ -5,6 +5,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import KernelPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.decomposition import PCA
+import xgboost as xgb
 
 def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
     
@@ -44,7 +46,7 @@ def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
         test_X = scaler.transform(test_X)
         
         if PCA_components != 0:
-            pca = KernelPCA(n_components = PCA_components)
+            pca = PCA(n_components = PCA_components)
             train_X = pca.fit_transform(train_X, y = None)
             test_X = pca.transform(test_X)
         
@@ -112,7 +114,7 @@ def RF_cross(rbps, targets, n_estimators = 100, min_samples_split = 16, PCA_comp
         test_X = scaler.transform(test_X)
         
         if PCA_components != 0:
-            pca = KernelPCA(n_components = PCA_components)
+            pca = PCA(n_components = PCA_components)
             train_X = pca.fit_transform(train_X, y = None)
             test_X = pca.transform(test_X)
        
