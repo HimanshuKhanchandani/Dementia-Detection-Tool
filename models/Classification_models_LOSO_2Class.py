@@ -7,6 +7,75 @@ from sklearn.decomposition import KernelPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
 import xgboost as xgb
+from sklearn.linear_model import LogisticRegression
+
+def log_reg_cross(rbps,targets, PCA_components = 0):
+    
+    '''
+    Performs training on features in rbps and targets using k nearest neighbor classification and performs cross-validation 
+    using leave one subject out method. 
+    
+    Parameters
+    ----------
+    rbps : list[ndarray]
+        List of feature arrays corresponding to each subject. 
+    targets : ndarray
+        Array of numeric class labels for each feature array.
+    n_neighbors: int
+           number of nearest neighbors to use
+    PCA_components: int
+           Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
+           
+    Returns
+    -------
+    train_metrics_dict : dictionary
+        Dictionary containing accuracy, sensitivity, specificity and f1 scores on the training data.
+    test_metrics_dict : dictionary
+        Dictionary containing accuracy, sensitivity, specificity and f1 scores on the validation  data.
+    
+    '''
+    confusion_matrices_train = []
+    confusion_matrices_test = []
+    labels = np.unique(targets)
+    for i in range(len(targets)):
+        train_X, train_y = train_prep(rbps,targets,exclude=i,flatten_final=True)
+        test_X = rbps[i].reshape(rbps[i].shape[0],-1)
+        test_y = targets[i]*np.ones(rbps[i].shape[0])
+
+        scaler = StandardScaler()
+        train_X = scaler.fit_transform(train_X)
+        test_X = scaler.transform(test_X)
+        
+        if PCA_components != 0:
+            pca = PCA(n_components = PCA_components)
+            train_X = pca.fit_transform(train_X, y = None)
+            test_X = pca.transform(test_X)
+        
+        log_reg = LogisticRegression(max_iter = 500)
+        log_reg.fit(train_X, train_y)
+        
+        confusion_matrices_train += [confusion_matrix(train_y, log_reg.predict(train_X),labels=labels)]
+        confusion_matrices_test += [confusion_matrix(test_y, log_reg.predict(test_X),labels=labels)]
+    
+    confusion_matrices_train = np.array(confusion_matrices_train)
+    confusion_matrices_test = np.array(confusion_matrices_test)
+    total_confusion_train = np.sum(confusion_matrices_train, axis= 0)
+    total_confusion_test = np.sum(confusion_matrices_test, axis= 0)
+    
+    train_metrics_dict = {'acc':accuracy(total_confusion_train), 'sens':sensitivity(total_confusion_train), 
+                            'spec':specificity(total_confusion_train), 'f1':f1(total_confusion_train)}
+    test_metrics_dict = {'acc':accuracy(total_confusion_test), 'sens':sensitivity(total_confusion_test), 
+                            'spec':specificity(total_confusion_test), 'f1':f1(total_confusion_test)}
+    
+    
+    return train_metrics_dict, test_metrics_dict
+
+
+
+
+
+
+
 
 def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
     
