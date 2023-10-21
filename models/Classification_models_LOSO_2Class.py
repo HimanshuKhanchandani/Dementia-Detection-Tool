@@ -210,7 +210,9 @@ def RF_cross(rbps, targets, n_estimators = 100, min_samples_split = 16, PCA_comp
     return train_metrics_dict, test_metrics_dict
     
 def svm_cross(rbps,targets,kernel,reg_parameter=1.0, degree=2, PCA_components = 0):
-    """_summary_
+    """
+    Performs training on features in rbps and targets using sklearn's svm C-Support vector classificaton and performs 
+    cross-validation using leave one subject out method. 
 
     Parameters
     ----------
