@@ -10,9 +10,9 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 
 ## How to navigate this repository
 
-1) All the pre-processing function necessary to get the input and output data in correct format: [processing_functions.py](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/processing_functions.py).
-2) All the baseline classification models: [classification_models.py](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/classification_models.py).
-3) Demonstration of classification performancer of the baseline models: [classification_performances.ipynb](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/classification_performances.ipynb).
+1) All the pre-processing function necessary to get the input and output data in correct format: [model_functions.py](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/model_functions.py).
+2) Functions for all the classification models we tried: [Classification_models_LOSO_2Class.py](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_models_LOSO_2Class.py)
+3) Demonstration of classification performances of the models: [Classification_performances.ipynb](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_performances.ipynb)
  
  ### Dependencies
  You need to have MNE package installed to read and work with EEG data in python. 
