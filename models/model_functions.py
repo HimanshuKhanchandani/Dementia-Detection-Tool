@@ -10,6 +10,10 @@ from scipy.integrate import simpson
 # subject ids of test set 
 TEST = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
 
+# Dictionary mapping the second-to-last array index in the output of load_data to the corresponding EEG channel
+CHANNELS = {0: 'Fp1', 1: 'Fp2', 2: 'F3', 3: 'F4', 4: 'C3', 5: 'C4', 6: 'P3', 7: 'P4', 8: 'O1', 9: 'O2', 
+ 10: 'F7', 11: 'F8', 12: 'T3', 13: 'T4', 14: 'T5', 15: 'T6', 16: 'Fz', 17: 'Cz', 18: 'Pz'}
+
 def load_subject(subject_id,path=DATA_PATH):
     """loads subject using their numeric id in the data folders"""
     return mne.io.read_raw_eeglab(path + '/derivatives/sub-' + str(subject_id).zfill(3)
