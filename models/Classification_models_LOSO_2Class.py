@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
-def log_reg_cross(rbps,targets, PCA_components = 0):
+def log_reg_cross(rbps,targets, PCA_components = 0,reg_parameter=1.0,max_iter=500):
     
     '''
     Performs training on features in rbps and targets using k nearest neighbor classification and performs cross-validation 
@@ -23,9 +23,13 @@ def log_reg_cross(rbps,targets, PCA_components = 0):
     targets : ndarray
         Array of numeric class labels for each feature array.
     n_neighbors: int
-           number of nearest neighbors to use
+        number of nearest neighbors to use
     PCA_components: int
-           Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
+        Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
+    reg_parameter: float
+        Parameter inversely proportional to strength of regularization
+    max_iter: int
+        Number of iterations taken for solvers to converge. 
            
     Returns
     -------
@@ -52,7 +56,7 @@ def log_reg_cross(rbps,targets, PCA_components = 0):
             train_X = pca.fit_transform(train_X, y = None)
             test_X = pca.transform(test_X)
         
-        log_reg = LogisticRegression(max_iter = 500)
+        log_reg = LogisticRegression(max_iter = max_iter,C=reg_parameter)
         log_reg.fit(train_X, train_y)
         
         confusion_matrices_train += [confusion_matrix(train_y, log_reg.predict(train_X),labels=labels)]
@@ -91,9 +95,9 @@ def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
     targets : ndarray
         Array of numeric class labels for each feature array.
     n_neighbors: int
-           number of nearest neighbors to use
+        number of nearest neighbors to use
     PCA_components: int
-           Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
+        Number of components to keep for principal components analysis. Defaults to 0 which is the case when we don't do PCA.
            
     Returns
     -------
