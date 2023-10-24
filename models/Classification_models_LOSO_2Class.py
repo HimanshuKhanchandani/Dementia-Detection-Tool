@@ -279,7 +279,7 @@ def svm_cross(rbps,targets,kernel,reg_parameter=1.0, degree=2, PCA_components = 
 
     return train_metrics_dict, test_metrics_dict
 
-def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_init = 0.001, hidden_layer_sizes = (3,1), max_iter = 200):
+def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_init = 0.001, hidden_layer_sizes = (3,1), max_iter = 200, random_state = None):
     
     '''
     Performs training on features in rbps and targets using multi-layer perceptron classification and performs cross-validation 
@@ -301,6 +301,8 @@ def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_in
         Initial learning rate used.
     hidden_layer_sizes: 
         tuple describing the number of neurons in each hidden layer.
+    random_state: int, default=None
+        Determines random number generation for various parts of the training process. 
            
     Returns
     -------
@@ -327,7 +329,7 @@ def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_in
             train_X = pca.fit_transform(train_X, y = None)
             test_X = pca.transform(test_X)
         
-        mlp = MLPClassifier(hidden_layer_sizes = hidden_layer_sizes, max_iter = max_iter,alpha = alpha, learning_rate_init = learning_rate_init)
+        mlp = MLPClassifier(hidden_layer_sizes = hidden_layer_sizes, max_iter = max_iter,alpha = alpha, learning_rate_init = learning_rate_init,random_state=random_state)
         mlp.fit(train_X, train_y)
         
         confusion_matrices_train += [confusion_matrix(train_y, mlp.predict(train_X),labels=labels)]
