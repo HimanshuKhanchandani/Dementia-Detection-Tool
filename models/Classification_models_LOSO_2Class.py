@@ -279,7 +279,7 @@ def svm_cross(rbps,targets,kernel,reg_parameter=1.0, degree=2, PCA_components = 
 
     return train_metrics_dict, test_metrics_dict
 
-def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_init = 0.001, hidden_layer_sizes = (3,1), max_iter = 200, random_state = None):
+def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_init = 0.001, hidden_layer_sizes = (3,1), max_iter = 200, solver = 'adam', random_state = None):
     
     '''
     Performs training on features in rbps and targets using multi-layer perceptron classification and performs cross-validation 
@@ -301,6 +301,8 @@ def mlp_cross(rbps,targets, PCA_components = 0, alpha = 0.0001, learning_rate_in
         Initial learning rate used.
     hidden_layer_sizes: 
         tuple describing the number of neurons in each hidden layer.
+    solver: {‘lbfgs’, ‘sgd’, ‘adam’}, default=’adam’
+        Solver to use for weight optimization.
     random_state: int, default=None
         Determines random number generation for various parts of the training process. 
            
