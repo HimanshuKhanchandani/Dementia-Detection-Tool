@@ -214,7 +214,7 @@ def remove_class(features,targets,class_):
     if class_ == 'A':
         return features[36:],targets[36:]
     if class_ == 'C':
-        return features[:36]+features[65:], targets[:36] + targets[65:]
+        return features[:36]+features[65:], np.append(targets[:36], targets[65:])
 
 def remove_test(features,targets,test):
     """
