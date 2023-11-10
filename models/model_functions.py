@@ -10,9 +10,13 @@ from scipy.integrate import simpson
 # subject ids of test set 
 TEST = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
 
-# Dictionary mapping the second-to-last array index in the output of load_data to the corresponding EEG channel
+# Dictionaries mapping the second-to-last array index in the output of load_data to the corresponding EEG channel. 
 CHANNELS = {0: 'Fp1', 1: 'Fp2', 2: 'F3', 3: 'F4', 4: 'C3', 5: 'C4', 6: 'P3', 7: 'P4', 8: 'O1', 9: 'O2', 
  10: 'F7', 11: 'F8', 12: 'T3', 13: 'T4', 14: 'T5', 15: 'T6', 16: 'Fz', 17: 'Cz', 18: 'Pz'}
+
+channels_dict = {'Fp1' : 0, 'Fp2': 1 , 'F3': 2, 'F4' : 3, 'C3': 4, 'C4': 5, 'P3': 6, 'P4' : 7, 'O1' : 8, 'O2':9, 
+'F7':10 , 'F8': 11, 'T3' : 12, 'T4' :13, 'T5' : 14, 'T6' : 15, 'Fz': 16, 'Cz': 17,'Pz': 18}
+
 
 def load_subject(subject_id,path=DATA_PATH):
     """loads subject using their numeric id in the data folders"""
@@ -224,6 +228,32 @@ def remove_test(features,targets,test):
     features_train = [features[i] for i in range(len(features)) if i not in test]
     target_train = [targets[i] for i in range(len(targets)) if i not in test]
     return features_train, target_train
+
+def remove_channel(input_rbp, channels_to_remove):
+    """
+    removes a list of EEG channels from the input list of feature arrays containing all 19 EEG channels.
+    
+    Parameters
+    ----------
+    input_rbp : list[ndarray]
+            List of feature arrays corresponding to each subject containing all 19 channels. The channel corresponds to 
+            second-to-last array index for the arrays.
+    channels_to_remove: list
+            List of EEG channels to remove.
+    
+    Returns
+    -------
+    updated_rbp: list[ndarray]
+            List of feature arrays corresponding to each subject not containing the removed channels.
+    """
+    
+    updated_rbp = []
+    all_channels = np.arange(0,19)
+    channels_removed_ind = [channels_dict[ch] for ch in channels_to_remove]
+    resulting_channels = np.delete(all_channels, channels_removed_ind)
+    updated_rbp = [rbp[:, resulting_channels, :] for rbp in input_rbp]
+    return updated_rbp
+
 
 
 def train_prep(features,targets,exclude=None,flatten_final=True):
