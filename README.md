@@ -1,4 +1,4 @@
-# Demential Detection Tool
+# Dementia Detection Tool
  Alzheimer's and Frontotemporal Dementia are neurogenerative disorders and are among the most common types of Dementia. Electroencephalography (EEG), which is an non invasive technique to measure the electrical activity in brain using external electrodes, may provide improved diagnosis of the disease. In this project, we evaluate and compare various machine learning models for this classification problem. 
 
 ## Usefulness of EEG for Alzheimer's and dementia detection.
