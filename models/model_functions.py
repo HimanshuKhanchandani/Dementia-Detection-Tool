@@ -229,6 +229,15 @@ def remove_test(features,targets,test):
     target_train = [targets[i] for i in range(len(targets)) if i not in test]
     return features_train, target_train
 
+def select_test(features,targets,test):
+    """
+    Removes test subjects from the list of feature arrays. Before using this function the labels
+    should be aligned with align_test_labels first based on the classification problem under consideration.
+    """
+    features_train = [features[i] for i in range(len(features)) if i in test]
+    target_train = [targets[i] for i in range(len(targets)) if i in test]
+    return features_train, target_train
+
 def remove_channel(input_rbp, channels_to_remove):
     """
     removes a list of EEG channels from the input list of feature arrays containing all 19 EEG channels.
