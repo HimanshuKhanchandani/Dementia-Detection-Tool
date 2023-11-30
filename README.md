@@ -1,5 +1,5 @@
 # Dementia Detection Tool
-Erdos Institute fall 2023 data science bootcamp
+Erdos Institute fall 2023 data science bootcamp project.
 ## Team members: 
 - [Himanshu Khanchandani](https://www.linkedin.com/in/himanshu-khanchandani-5b2b8675/)
 - [Clark Butler](https://www.linkedin.com/in/clark-butler-608446247/)
