@@ -1,4 +1,13 @@
 # Dementia Detection Tool
+Erdos Institute fall 2023 data science bootcamp
+## Team members 
+-[Himanshu Khanchandani](https://www.linkedin.com/in/himanshu-khanchandani-5b2b8675/)
+-[Clark Butler](https://www.linkedin.com/in/clark-butler-608446247/)
+-[Çisil Karagüzel](https://www.linkedin.com/in/%C3%A7isil-k-886253155/)
+-[Selman Ipek](https://www.linkedin.com/in/selman-ipek-12421613a/)
+-[Shreya Shukla](https://www.linkedin.com/in/shreya-shukla-uci/)
+
+## Overview
  Alzheimer's and Frontotemporal Dementia are neurogenerative disorders and are among the most common types of Dementia. Electroencephalography (EEG), which is an non invasive technique to measure the electrical activity in brain using external electrodes, may provide improved diagnosis of the disease. In this project, we evaluate and compare various machine learning models for this classification problem. 
 ## Use cases
 A machine learning based classifier for Alzheimer's and frontotemporal demential will be extremely useful in hospital and lab settings to screen patients before subjecting them to more invasive treatments or tests.  
