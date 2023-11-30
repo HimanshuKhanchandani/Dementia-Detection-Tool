@@ -4,6 +4,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import mne
+from config import DATA_PATH, PROCESSED_DATA_PATH
+
 
 from mne_connectivity import (spectral_connectivity_epochs,
                               spectral_connectivity_time)
@@ -21,7 +23,7 @@ Generate raw EEG data of desired epoch length.
 """
 
 
-def generate_and_save_data(is_epoched,n_times,overlap_ratio,save = True, filename = "insert", subjects = [i for i in range(88)]):
+def generate_and_save_data(is_epoched,n_times,overlap_ratio,save = True, filename = "insert", subjects = [i for i in range(88)],path = DATA_PATH):
     """
     Inputs:
     is_epoched: Boolean: should the data be epoched. (True = yes).
@@ -40,7 +42,7 @@ def generate_and_save_data(is_epoched,n_times,overlap_ratio,save = True, filenam
     features = []
     for i in subjects:
         ppt = i + 1
-        raw_data = mne.io.read_raw_eeglab('data/ds004504/derivatives/' + ppt_id(ppt)
+        raw_data = mne.io.read_raw_eeglab(path+'/derivatives/' + ppt_id(ppt)
                                     + '/eeg/' + ppt_id(ppt) + '_task-eyesclosed_eeg.set', preload = True)
         export = raw_data.to_data_frame()
         ppt_array = export.iloc[:,range(1,len(export.columns))].values
@@ -201,14 +203,14 @@ Generate relative band power of desired epoch length.
 """    
 
 
-def process(epoch_length,overlap_ratio,freq_bands,nperseg, absolute=False, sample_freq=500,total_subjects=88):
+def process(epoch_length,overlap_ratio,freq_bands,nperseg, absolute=False, sample_freq=500,total_subjects=88,path = DATA_PATH):
     features = []
     if absolute:
         absolute_features = []
         total_features = []
     for i in range(total_subjects):
         ppt = i + 1
-        raw_data = mne.io.read_raw_eeglab('data/ds004504/derivatives/' + ppt_id(ppt)
+        raw_data = mne.io.read_raw_eeglab(path + '/derivatives/' + ppt_id(ppt)
                                     + '/eeg/' + ppt_id(ppt) + '_task-eyesclosed_eeg.set', preload = True)
         export = raw_data.to_data_frame()
         ppt_array = export.iloc[:,range(1,len(export.columns))].values
@@ -372,124 +374,6 @@ def get_con_rbp_data(con_data,rbp_data,subjects):
     return np.array(processed_data, dtype = object)
 
 
-"""
-###########################################################
-###########################################################
-Training functions:
-###########################################################
-###########################################################
-"""   
-
-
-def remove_test(features,test):
-    features_train = [features[i] for i in range(len(features)) if i not in test]
-    #target_train = [targets[i] for i in range(len(targets)) if i not in test]
-    return features_train
-
-
-def remove_test_targets(targets, test):
-    target_train = [targets[i] for i in range(len(targets)) if i not in test]
-    return target_train
-
-def get_arr(data, idx , epoch): 
-    trials = [(data[idx][epoch].reshape(-1,))[i] for i in range(16) if (data[idx][epoch].reshape(-1,))[i] != 0]
-    m = len(trials)
-    return (np.array(trials)).reshape((1,m))
-
-
-def get_all_freq_arr(all_data,idx, epoch):
-    r = get_arr(all_data[0], idx , epoch)
-    for i in range(1,len(all_data)):
-        r = np.concatenate((r,get_arr(all_data[i], idx , epoch)),axis =1)
-        
-    return r
-
-
-def get_all_epochs_data(all_data,idx):
-    r = get_all_freq_arr(all_data,idx,0)
-    for j in range(1,len(all_data[0][idx])):
-        r = np.concatenate((r,get_all_freq_arr(all_data,idx,j)),axis = 0)
-    return r
-
-
-def get_all_features(all_data):
-    output_array = [];
-    for j in range(len(all_data[0])):
-        r = get_all_epochs_data(all_data,j)
-        output_array = output_array + [r]
-    return output_array
-
-
-"""
-###########################################################
-###########################################################
-Training functions:
-###########################################################
-###########################################################
-"""  
-
-
-
-
-def train_prep(features,targets,exclude=None,flatten_final=True):
-    total_subjects = len(targets)
-    target_list = []
-    for i in range(total_subjects):
-        num_epochs = features[i].shape[0]
-        target_list.append(targets[i]*np.ones(num_epochs))
-    if exclude==None: 
-        features_array = np.concatenate(features)
-        targets_array = np.concatenate(target_list)
-    else:
-        features_array = np.concatenate(features[:exclude] + features[exclude+1:])
-        targets_array  = np.concatenate(target_list[:exclude] + target_list[exclude+1:])
-    if flatten_final:
-        features_array = features_array.reshape((features_array.shape[0],-1))
-    return features_array, targets_array
-
-
-
-
-def kNN_cross(rbps,targets,n_neighbors, PCA_components = 0):
-   
-    confusion_matrices_train = []
-    confusion_matrices_test = []
-    labels = np.unique(targets)
-    for i in range(len(targets)):
-        train_X, train_y = train_prep(rbps,targets,exclude=i,flatten_final=True)
-        test_X = rbps[i].reshape(rbps[i].shape[0],-1)
-        test_y = targets[i]*np.ones(rbps[i].shape[0])
-
-        scaler = StandardScaler()
-        train_X = scaler.fit_transform(train_X)
-        test_X = scaler.transform(test_X)
-        
-        if PCA_components != 0:
-            pca = PCA(n_components = PCA_components)
-            train_X = pca.fit_transform(train_X, y = None)
-            test_X = pca.transform(test_X)
-        
-        ThreeNN = KNeighborsClassifier(n_neighbors=n_neighbors)
-        ThreeNN.fit(train_X, train_y)
-        
-        confusion_matrices_train += [confusion_matrix(train_y, ThreeNN.predict(train_X),labels=labels)]
-        confusion_matrices_test += [confusion_matrix(test_y,ThreeNN.predict(test_X),labels=labels)]
-    
-    confusion_matrices_train = np.array(confusion_matrices_train)
-    confusion_matrices_test = np.array(confusion_matrices_test)
-    total_confusion_train = np.sum(confusion_matrices_train, axis= 0)
-    total_confusion_test = np.sum(confusion_matrices_test, axis= 0)
-    
-    train_metrics_dict = {'acc':accuracy(total_confusion_train), 'sens':sensitivity(total_confusion_train), 
-                            'spec':specificity(total_confusion_train), 'f1':f1(total_confusion_train)}
-    test_metrics_dict = {'acc':accuracy(total_confusion_test), 'sens':sensitivity(total_confusion_test), 
-                            'spec':specificity(total_confusion_test), 'f1':f1(total_confusion_test)}
-    
-    
-    return train_metrics_dict, test_metrics_dict
-
-
-    
 
 
 
