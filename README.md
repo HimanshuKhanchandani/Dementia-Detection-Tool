@@ -22,10 +22,10 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 ## How to navigate this repository
 1) All the relevant modeling and data processing happens inside the models folder. 
 2) Once you download the data in your favorite location, put that location into [config.py](models/config.py) within the models folder, and that should make all the other scripts access the data easily. Also create and then specify the location of the processed data folder in config.py file, so that when you can run the relevant code, it will store the processed data.
-3) All the pre-processing function necessary to get the input and output data in correct format: [model_functions.py](https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/model_functions.py).
-4) Data visualization and exploratory data analysis: [DataVisualization.ipynb](https://github.com/HimanshuKhanchandani/Dementia-Detection-Tool/blob/main/models/DataVisualization.ipynb) 
-5) Functions for all the classification models we tried: [Classification_models_functions_LOSO_2Class.py]([https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_models_LOSO_2Class.py](https://github.com/HimanshuKhanchandani/Dementia-Detection-Tool/blob/main/models/Classification_models_functions_LOSO_2Class.py))
-6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_performances.ipynb](https://github.com/HimanshuKhanchandani/Dementia-Detection-Tool/blob/main/models/Classification_cross_validation.ipynb))
+3) All the pre-processing function necessary to get the input and output data in correct format: [model_functions.py](models/model_functions.py).
+4) Data visualization and exploratory data analysis: [DataVisualization.ipynb](models/DataVisualization.ipynb) 
+5) Functions for all the classification models we tried: [Classification_models_functions_LOSO_2Class.py]([https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_models_LOSO_2Class.py](models/Classification_models_functions_LOSO_2Class.py))
+6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb))
 7) Training the final chosen model on all the train data and saving for the web app: [Final_ADHealthy_model_save.ipynb](models/Final_ADHealthy_model_save.ipynb).
 
 ## Features and model used
