@@ -7,6 +7,10 @@ from scipy.integrate import simpson
 
 # STABLE
 
+'''
+This python file contains all the necessary functions to take the data and extract the relative band power features we use for modeling. The process involves taking the EEG and chopping it up into epochs, calculating relative band powers and then saving the relative band powers as a pickle file. The file also contains some functions necessary to prepare the data for the training algorithm.
+'''
+
 # subject ids of test set 
 TEST = [4, 6, 8, 20, 33, 49, 53, 63, 71, 72]
 
@@ -231,7 +235,7 @@ def remove_test(features,targets,test):
 
 def select_test(features,targets,test):
     """
-    Removes test subjects from the list of feature arrays. Before using this function the labels
+    Selects test subjects from the list of feature arrays. Before using this function the labels
     should be aligned with align_test_labels first based on the classification problem under consideration.
     """
     features_train = [features[i] for i in range(len(features)) if i in test]
