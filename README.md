@@ -36,7 +36,7 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 5) Functions for all the classification models we tried: [Classification_models_functions_LOSO_2Class.py]([https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_models_LOSO_2Class.py](models/Classification_models_functions_LOSO_2Class.py))
 6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb))
 7) Training the final chosen model on all the train data and saving for the web app: [Final_ADHealthy_model_save.ipynb](models/Final_ADHealthy_model_save.ipynb).
-8) To generate connectivity data:[con_plus_rbp_features.ipynb]([main/con_plus_rbp_features.ipynb).
+8) To generate connectivity data:[con_plus_rbp_features.ipynb](con_plus_rbp_features.ipynb).
 
 ## Features and model used
 For a summary of our feature and model selection process, look at our [presentation slides](Erdos_Presentation_slides.pdf). But here is a brief summary: 
