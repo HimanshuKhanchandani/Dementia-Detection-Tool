@@ -375,6 +375,96 @@ def get_con_rbp_data(con_data,rbp_data,subjects):
 
 
 
+"""
+###########################################################
+###########################################################
+Training functions:
+###########################################################
+###########################################################
+""" 
+
+
+
+def get_arr(data, idx , epoch): 
+    trials = [(data[idx][epoch].reshape(-1,))[i] for i in range(16) if (data[idx][epoch].reshape(-1,))[i] != 0]
+    m = len(trials)
+    return (np.array(trials)).reshape((1,m))
+
+def get_all_freq_arr(all_data,idx, epoch):
+    r = get_arr(all_data[0], idx , epoch)
+    for i in range(1,len(all_data)):
+        r = np.concatenate((r,get_arr(all_data[i], idx , epoch)),axis =1)
+        
+    #r=np.concatenate((get_arr(all_data[0], idx , epoch),get_arr(all_data[1], idx , epoch),get_arr(all_data[2], idx , epoch),get_arr(all_data[3], idx , epoch),get_arr(all_data[4], idx , epoch)), axis=1)
+    return r
+
+def get_all_epochs_data(all_data,idx):
+    r = get_all_freq_arr(all_data,idx,0)
+    for j in range(1,len(all_data[0][idx])):
+        r = np.concatenate((r,get_all_freq_arr(all_data,idx,j)),axis = 0)
+    return r   
+
+def get_all_features(all_data):
+    output_array = [];
+    for j in range(len(all_data[0])):
+        r = get_all_epochs_data(all_data,j)
+        output_array = output_array + [r]
+    return output_array
+
+#the following is from the train_prep code from model_functions.npy
+def train_prep(features,targets,exclude=None,flatten_final=True):
+    total_subjects = len(targets)
+    target_list = []
+    for i in range(total_subjects):
+        num_epochs = features[i].shape[0]
+        target_list.append(targets[i]*np.ones(num_epochs))
+    if exclude==None: 
+        features_array = np.concatenate(features)
+        targets_array = np.concatenate(target_list)
+    else:
+        features_array = np.concatenate(features[:exclude] + features[exclude+1:])
+        targets_array  = np.concatenate(target_list[:exclude] + target_list[exclude+1:])
+    if flatten_final:
+        features_array = features_array.reshape((features_array.shape[0],-1))
+    return features_array, targets_array
+
+def kNN_cross(features,targets,n_neighbors, PCA_components = 0):
+   
+    confusion_matrices_train = []
+    confusion_matrices_test = []
+    labels = np.unique(targets)
+    for i in range(len(targets)):
+        train_X, train_y = train_prep(features,targets,exclude=i,flatten_final=True)
+        test_X = features[i].reshape(features[i].shape[0],-1)
+        test_y = targets[i]*np.ones(features[i].shape[0])
+
+        scaler = StandardScaler()
+        train_X = scaler.fit_transform(train_X)
+        test_X = scaler.transform(test_X)
+        
+        if PCA_components != 0:
+            pca = PCA(n_components = PCA_components)
+            train_X = pca.fit_transform(train_X, y = None)
+            test_X = pca.transform(test_X)
+        
+        ThreeNN = KNeighborsClassifier(n_neighbors=n_neighbors)
+        ThreeNN.fit(train_X, train_y)
+        labels=[1,2]
+        confusion_matrices_train += [confusion_matrix(train_y, ThreeNN.predict(train_X),labels=labels)]
+        confusion_matrices_test += [confusion_matrix(test_y,ThreeNN.predict(test_X),labels=labels)]
+    
+    confusion_matrices_train = np.array(confusion_matrices_train)
+    confusion_matrices_test = np.array(confusion_matrices_test)
+    total_confusion_train = np.sum(confusion_matrices_train, axis= 0)
+    total_confusion_test = np.sum(confusion_matrices_test, axis= 0)
+    
+    train_metrics_dict = {'acc':accuracy(total_confusion_train), 'sens':sensitivity(total_confusion_train), 
+                            'spec':specificity(total_confusion_train), 'f1':f1(total_confusion_train)}
+    test_metrics_dict = {'acc':accuracy(total_confusion_test), 'sens':sensitivity(total_confusion_test), 
+                            'spec':specificity(total_confusion_test), 'f1':f1(total_confusion_test)}
+    
+    
+    return train_metrics_dict, test_metrics_dict
 
 
 
