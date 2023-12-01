@@ -36,7 +36,7 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 3) All the pre-processing function necessary to get the input and output data in correct format: [model_functions.py](models/model_functions.py).
 4) Data visualization and exploratory data analysis: [DataVisualization.ipynb](models/DataVisualization.ipynb) 
 5) Functions for all the classification models we tried: [Classification_models_LOSO_2Class.py](models/Classification_models_LOSO_2Class.py)
-6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb))
+6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb)
 7) Training the final chosen model on all the train data and saving for the web app: [Final_ADHealthy_model_save.ipynb](models/Final_ADHealthy_model_save.ipynb).
 8) To generate spectral connectivity data: [con_plus_rbp_features.ipynb](models/con_plus_rbp_features.ipynb).
 
