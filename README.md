@@ -39,7 +39,6 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb))
 7) Training the final chosen model on all the train data and saving for the web app: [Final_ADHealthy_model_save.ipynb](models/Final_ADHealthy_model_save.ipynb).
 8) To generate spectral connectivity data: [con_plus_rbp_features.ipynb](models/con_plus_rbp_features.ipynb).
-9) To see our explorations of using spectral connectivity for Alzheimer's vs FTD approach: [AD-FTD analysis using different methods.ipynb](models/AD-FTD analysis using different methods.ipynb).
 
 ## Features and model used
 For a summary of our feature and model selection process, look at our [presentation slides](Erdos_Presentation_slides.pdf). But here is a brief summary: 
