@@ -11,6 +11,12 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
+'''
+This file defines the necessary functions to perform leave-one-subject-out cross validation using different classification 
+algorithms. To prepare the data ready for training, it uses functions from the model_functions file. 
+'''
+
+
 def log_reg_cross(rbps,targets, PCA_components = 0,reg_parameter=1.0,max_iter=500):
     
     '''

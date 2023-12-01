@@ -8,7 +8,10 @@ from scipy.integrate import simpson
 # STABLE
 
 '''
-This python file contains all the necessary functions to take the data and extract the relative band power features we use for modeling. The process involves taking the EEG and chopping it up into epochs, calculating relative band powers and then saving the relative band powers as a pickle file. The file also contains some functions necessary to prepare the data for the training algorithm.
+This python file contains all the necessary functions to take the data and extract the relative band power features we use for
+modeling. The process involves taking the EEG and chopping it up into epochs, calculating relative band powers and then saving
+the relative band powers as a pickle file. The file also contains some functions necessary to prepare the data for the training
+algorithm.
 '''
 
 # subject ids of test set 
