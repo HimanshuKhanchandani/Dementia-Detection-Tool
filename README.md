@@ -16,7 +16,7 @@ The dataset for the project can be found on https://github.com/OpenNeuroDatasets
 
 The data consists of resting state eyes closed EEG of 88 subjects out of which 36 have Alzheimer's, 23 have frontotemporal dementia and the other 29 are healthy subjects. The EEG was recorded from 19 scalp electrodes for 10- 13 min for each subject with a sampling frequency of 500 Hz, and is available as a .set file. 
 
-The EEGs for 5 Alzheimer's, 2 frontotemporal dementia, and 3 healthy subjects were set aside for testing the final model. The remaining EEGs were used for our exploratory data analysis and model selection via leave one subject out cross validation.
+The EEGs for 5 Alzheimer's, 2 frontotemporal dementia, and 3 healthy subjects were set aside for testing the final model. The remaining EEGs were used to train our model after performing exploratory data analysis and model selection via leave one subject out cross validation.
  ## Dependencies
  Following packages need to be installed: 
  ```
