@@ -35,15 +35,16 @@ To see that EEG is a useful tool to diagnose dementia, here we show plots of pow
 2) Once you download the data in your favorite location, put that location into [config.py](models/config.py) within the models folder, and that should make all the other scripts access the data easily. Also create and then specify the location of the processed data folder in config.py file, so that when you can run the relevant code, it will store the processed data.
 3) All the pre-processing function necessary to get the input and output data in correct format: [model_functions.py](models/model_functions.py).
 4) Data visualization and exploratory data analysis: [DataVisualization.ipynb](models/DataVisualization.ipynb) 
-5) Functions for all the classification models we tried: [Classification_models_functions_LOSO_2Class.py]([https://github.com/HimanshuKhanchandani/Demential-Detection-Tool/blob/main/models/Classification_models_LOSO_2Class.py](models/Classification_models_functions_LOSO_2Class.py))
+5) Functions for all the classification models we tried: [Classification_models_LOSO_2Class.py](models/Classification_models_LOSO_2Class.py)
 6) Cross-validation of classification models: [Classification_cross_validation.ipynb]([models/Classification_cross_validation.ipynb))
 7) Training the final chosen model on all the train data and saving for the web app: [Final_ADHealthy_model_save.ipynb](models/Final_ADHealthy_model_save.ipynb).
-8) To generate connectivity data: [con_plus_rbp_features.ipynb](models/con_plus_rbp_features.ipynb).
+8) To generate spectral connectivity data: [con_plus_rbp_features.ipynb](models/con_plus_rbp_features.ipynb).
+9) To see our explorations of using spectral connectivity for Alzheimer's vs FTD approach: [AD-FTD analysis using different methods.ipynb](models/AD-FTD analysis using different methods.ipynb).
 
 ## Features and model used
 For a summary of our feature and model selection process, look at our [presentation slides](Erdos_Presentation_slides.pdf). But here is a brief summary: 
 
-We divide the EEG of each subject into smaller epochs of 2 minutes each with fifty percent overlap amongst epochs. This gives us a final training dataset with 702 data points. The features consist of power spectrum of each epoch in each channel integrated over six frequency bands namely : (0.5- 4 Hz), (4.0 - 7.0 Hz), (7.0 - 9.0 Hz), (11.0- 13.0 Hz), (13.0 - 25.0 Hz). To be more precise, the features are relative band powers in these frequency bands. And we use 15 out of the original 19 channels, so there are in total 90 features (15 channels for six frequency bands).
+We divide the EEG of each subject into smaller epochs of 2 minutes each with fifty percent overlap amongst epochs. The features consist of power spectrum of each epoch in each channel integrated over six frequency bands namely : (0.5- 4 Hz), (4.0 - 7.0 Hz), (7.0 - 9.0 Hz), (11.0- 13.0 Hz), (13.0 - 25.0 Hz). To be more precise, the features are relative band powers in these frequency bands. And we use 15 out of the original 19 channels, so there are in total 90 features (15 channels for six frequency bands).
 
 After cross-validation, we chose a support vector machine classifier, with a linear kernel and a regularization parameter 1.21, as the most accurate model which achieved a cross-validation accuracy of 89%. 
  
