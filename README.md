@@ -15,6 +15,8 @@ A machine learning based classifier for Alzheimer's and frontotemporal demential
 The dataset for the project can be found on https://github.com/OpenNeuroDatasets/ds004504/tree/main and may be downloaded using datalad. If you are new to datalad, like I was, following tutorial may be helpful (https://psychoinformatics-de.github.io/rdm-course/aio/index.html). 
 
 The data consists of resting state eyes closed EEG of 88 subjects out of which 36 have Alzheimer's, 23 have frontotemporal dementia and the other 29 are healthy subjects. The EEG was recorded from 19 scalp electrodes for 10- 13 min for each subject with a sampling frequency of 500 Hz, and is available as a .set file. 
+
+The EEGs for 5 Alzheimer's, 2 frontotemporal dementia, and 3 healthy subjects were set aside for testing the final model. The remaining EEGs were used for our exploratory data analysis and model selection via leave one subject out cross validation.
  ## Dependencies
  Following packages need to be installed: 
  ```
@@ -43,7 +45,7 @@ For a summary of our feature and model selection process, look at our [presentat
 
 We divide the EEG of each subject into smaller epochs of 2 minutes each with fifty percent overlap amongst epochs. This gives us a final training dataset with 702 data points. The features consist of power spectrum of each epoch in each channel integrated over six frequency bands namely : (0.5- 4 Hz), (4.0 - 7.0 Hz), (7.0 - 9.0 Hz), (11.0- 13.0 Hz), (13.0 - 25.0 Hz). To be more precise, the features are relative band powers in these frequency bands. And we use 15 out of the original 19 channels, so there are in total 90 features (15 channels for six frequency bands).
 
-After cross-validation, we chose a support vector machine classifier, with a linear kernel and a regularization parameter 1.21, as the msot accurate model which achieved a cross-validation accuracy of 89%. 
+After cross-validation, we chose a support vector machine classifier, with a linear kernel and a regularization parameter 1.21, as the most accurate model which achieved a cross-validation accuracy of 89%. 
  
 
  ## Applying the model
